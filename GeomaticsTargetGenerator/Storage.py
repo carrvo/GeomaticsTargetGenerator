@@ -2,6 +2,8 @@
 This module is for dealing with the filesystem.
 """
 
+import os
+
 from bs4 import BeautifulSoup
 
 from .TargetDefinition import TargetDefinition
@@ -32,6 +34,14 @@ class TargetFile(object):
         """
         location = '\\'.join([TargetFile.STORAGE_LOCATION, self.filename])
         return '.'.join([location, filetype])
+
+    @staticmethod
+    def AvailableNames():
+        """
+        Set of all available files.
+        """
+        target_directory = os.path.abspath(TargetFile.STORAGE_LOCATION)
+        return {name.split('.')[0] if os.path.isfile(os.path.join(target_directory, name)) for name in os.listdir(target_directory) }
 
     def LoadTargetDefinition(self):
         """

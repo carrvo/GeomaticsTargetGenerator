@@ -2,7 +2,6 @@
 This module deals with interactive console editing.
 """
 
-import os
 from cmd import Cmd
 
 from .__init__ import *
@@ -80,8 +79,7 @@ class Console(Cmd):
         """
         Buffers available file names.
         """
-        target_directory = os.path.abspath(TargetFile.STORAGE_LOCATION)
-        self.names = {name.split('.')[0] if os.path.isfile(os.path.join(target_directory, name)) for name in os.listdir(target_directory) }
+        self.names = TargetFile.AvailableNames()
 
     def do_names(self, arg):
         """
@@ -99,7 +97,8 @@ class Console(Cmd):
         if arg in self.names:
             self.current_file.LoadTargetDefinition()
         else:
-            print("New File.")
+            print('New File:', arg)
+            self.names.update(arg)
 
     def do_save(self, arg):
         """
