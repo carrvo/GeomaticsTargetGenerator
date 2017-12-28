@@ -38,7 +38,7 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
         """
         """
         directory = TargetFile.TargetDirectory()
-        for filename in os.listdir(filename):
+        for filename in os.listdir(directory):
             if filename.startswith(cls.TestFile):
                 os.remove(os.path.join(directory, filename))
 
@@ -53,14 +53,14 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
         """
         pass
 
-    def _ssubtests(self):
+    def _subtests(self):
         for name in sorted(dir(self)):
             if name.startswith("subtest_"):
                 yield name, getattr(self, name)
 
     def test_steps(self):
-        for i, name, subtest in enumerate(self._steps()):
-            with self.subTest(i=i, name=name):
+        for name, subtest in self._subtests():
+            with self.subTest(name=name):
                 subtest()
 
     def subtest_1(self):
@@ -68,7 +68,7 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
         Tests completed execution of saving a Target.
         """
         self.target_file.SaveTargetDefinition(self.target_definition)
-        self.assertTrue(True)
+        self.assertTrue(os.path.isfile(self.target_file.name(TargetFile.TDEF)))
 
     def subtest_2(self):
         """
@@ -94,7 +94,7 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
         """
         self.target_file = TargetFile(TargetDefinitionLifeCycle.TestFile + '2')
         self.target_file.SaveTargetDefinition(self.target_definition)
-        self.assertTrue(True)
+        self.assertTrue(os.path.isfile(self.target_file.name(TargetFile.TDEF)))
 
     def subtest_5(self):
         """
@@ -110,7 +110,8 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
             angles 30 60 90 90 90 angular_units=degrees
             done
             save Definition
+            exit
         """.format(testfile=TargetDefinitionLifeCycle.TestFile))
         console = Console(stdin=commands)
-        console.cmdLoop()
-        self.assertTrue(True)
+        console.cmdloop() #Do not see file when forced not remove from tearDownClass
+        self.assertTrue(os.path.isfile(self.target_file.name(TargetFile.TDEF)))

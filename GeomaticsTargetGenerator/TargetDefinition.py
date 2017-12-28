@@ -34,11 +34,11 @@ class BarCode(object):
         """
         Changes the Inner Radus and Outer Radius.
         """
-        assert 0 < inner_radius < 100, "Cannot be negative or exceed 100%."
-        assert 0 < outer_radius <= 100, "Cannot be negative or exceed 100%."
-        assert outer_radius > inner_radius, "Must have radii increase."
-        self.InnerRadius = inner_radius
-        self.OuterRadius = outer_radius
+        assert 0 < inner < 100, "InnerRadius cannot be negative or exceed 100%."
+        assert 0 < outer <= 100, "OuterRadius cannot be negative or exceed 100%."
+        assert outer > inner, "Must have radii increase."
+        self.InnerRadius = inner
+        self.OuterRadius = outer
 
     def ChangeAngles(self, angles, angular_units='radians'):
         """
@@ -96,7 +96,7 @@ class TargetDefinition(object):
         assert isinstance(ring, BarCode), "Currently only support adding BarCode Instances"
         if self.Cocentric: #If not empty
             assert ring.InnerRadius > self.Cocentric[-1].OuterRadius, "Must be ordered towards the outside."
-            assert ring.Width > self.Cocentric[-1].Width(), "Must have width increase."
+            assert ring.Width() > self.Cocentric[-1].Width(), "Must have width increase."
         self.Cocentric.append(ring)
 
     def RemoveFrom(self, ring_level):

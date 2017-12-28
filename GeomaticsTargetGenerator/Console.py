@@ -25,8 +25,8 @@ class Console(Cmd):
         self.current_target_definition = None
         self.available_names()
 
-    def parseLine(self, line):
-        cmd, arg, line = super().parseLine(line)
+    def parseline(self, line):
+        cmd, arg, line = super().parseline(line)
         cmd = cmd.lower()
         arg = arg.split(' ')
         if len(arg) == 1:
@@ -34,7 +34,7 @@ class Console(Cmd):
         elif len(arg) == 0:
             arg = None
         return (cmd, arg, line)
-    parseLine.__doc__ = super().parseLine.__doc__
+    parseline.__doc__ = Cmd.parseline.__doc__
 
     def precmd(self, line):
         """
@@ -47,7 +47,7 @@ class Console(Cmd):
         """
         if self.subcommand:
             if self.subcommand_state:
-                cmd, arg, line = self.parseLine(line)
+                cmd, arg, line = self.parseline(line)
                 self.subcommand(cmd, arg)
             else: #Subcommand is done
                 self.prompt = self.primary_prompt
@@ -162,7 +162,7 @@ class Console(Cmd):
             current.ChangeRadii(float(arg[0]), float(arg[1]))
         elif cmd == 'angles':
             current.ChangeAngles(
-                [float(angle) if angle.find('=') == -1 for angle in arg],
+                [float(angle) for angle in arg if angle.find('=') == -1],
                 angular_units= arg[-1].split('=')[1] if arg[-1].find('=') != -1 else 'radians'
             )
         elif cmd == 'code':
@@ -203,8 +203,8 @@ class Console(Cmd):
         """
         #args = (a if a.find('=') == -1 for a in arg)
         #kwargs = {a.split('=')[0]:a.split('=')[1] if a.find('=') != -1 for a in arg}
-        args = (float(arg[0]), float(arg[1]), [float(a) if a.find('=') == -1 for a in arg[2:]])
-        kwargs = {a.split('=')[0]:a.split('=')[1] if a.find('=') != -1 for a in arg[3:]}
+        args = (float(arg[0]), float(arg[1]), [float(a) for a in arg[2:] if a.find('=') == -1])
+        kwargs = {a.split('=')[0]:a.split('=')[1]for a in arg[3:] if a.find('=') != -1 }
         self.current_target_definition.Add(BarCode(*args, **kwargs))
 
     def do_addcode(self, arg):

@@ -44,7 +44,7 @@ if __name__ == '__main__':
     elif args.file:
         console = Console(stdin=args.file)
     if console:
-        console.cmdLoop()
+        console.cmdloop()
     if args.preview:
         file = Storage(args.preview)
         target_definition = file.LoadTargetDefinition()

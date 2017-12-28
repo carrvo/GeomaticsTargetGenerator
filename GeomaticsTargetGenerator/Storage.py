@@ -48,7 +48,7 @@ class TargetFile(object):
         Set of all available files.
         """
         target_directory = TargetFile.TargetDirectory()
-        return {name.split('.')[0] if os.path.isfile(os.path.join(target_directory, name)) for name in os.listdir(target_directory) }
+        return { name.split('.')[0] for name in os.listdir(target_directory) if os.path.isfile(os.path.join(target_directory, name)) }
 
     def LoadTargetDefinition(self, NotFoundMaxRadius=None):
         """
