@@ -13,23 +13,61 @@ class BarCode(object):
     """
     """
 
-    def __init__(self, inner_radius, outer_radius, angles):
+    def __init__(self, inner_radius, outer_radius, angles, coded=False):
         """
         Initializes.
+        if coded then angles is the input code.
         """
-        assert 0 < inner_radius < 100, "Cannot be negative or exceed 100%."
-        assert 0 < outer_radius <= 100, "Cannot be negative or exceed 100%."
-        assert outer_radius > inner_radius, "Must have radii increase."
-        self.InnerRadius = inner_radius
-        self.OuterRadius = outer_radius
-        assert sum(angles) == 2 * math.pi, "Must have total angles be a full circle."
-        self.Angles = angles
+        self.ChangeRadii(inner_radius, outer_radius)
+        if coded:
+            self.ChangeCode(angles)
+        else:
+            self.ChangeAngles(angles)
 
     def Width(self):
         """
         Radial width of BarCode.
         """
         return self.OuterRadius - self.InnerRadius
+
+    def ChangeRadii(self, inner, outer):
+        """
+        Changes the Inner Radus and Outer Radius.
+        """
+        assert 0 < inner_radius < 100, "Cannot be negative or exceed 100%."
+        assert 0 < outer_radius <= 100, "Cannot be negative or exceed 100%."
+        assert outer_radius > inner_radius, "Must have radii increase."
+        self.InnerRadius = inner_radius
+        self.OuterRadius = outer_radius
+
+    def ChangeAngles(self, angles):
+        """
+        Changes the angles and performs check that make a full circle.
+        """
+        assert sum(angles) == 2 * math.pi, "Must have total angles be a full circle."
+        self.Angles = angles
+
+    def ChangeCode(self, code):
+        """
+        """
+        pass #TODO
+
+    def __repr__(self):
+        """
+        Machine representation of object.
+        """
+        super().__repr__() #TODO?
+
+    def __str__(self):
+        """
+        Human readable representation of object.
+        """
+        return '''
+            InnerRadius: {}
+            OuterRadius: {}
+            Angles: {}
+        '''.format(self.InnerRadius, self.OuterRadius, self.Angles)
+
 
 class TargetDefinition(object):
     """
@@ -39,10 +77,15 @@ class TargetDefinition(object):
         """
         Initializes.
         """
-        assert max_radius != 0, "Must have a radius."
         self.Cocentric = [] #Ordered Towards Outside
-        self.MaxRadius = max_radius
+        self.ChangeMaxRadius(max_radius)
         self.ColouredCircles = [] #Name to be changed
+
+    def ChangeMaxRadius(self, radius):
+        """
+        """
+        assert radius != 0, "Must have a radius."
+        self.MaxRadius = radius
 
     def Add(self, ring):
         """
@@ -54,10 +97,28 @@ class TargetDefinition(object):
             assert ring.Width > self.Cocentric[-1].Width(), "Must have width increase."
         self.Cocentric.append(ring)
 
-    def AddColouredCircle(ColouredCircle):
+    def RemoveFrom(self, ring_level):
+        """
+        Gets the BarCode at ring_level.
+        """
+        ret = self.Cocentric[ring_level:]
+        self.Cocentric[:ring_level]
+        return ret
+
+    def AddColouredCircle(self, ColouredCircle):
         """
         """
         pass #TODO
+
+    def GetColouredCircle(self, number):
+        """
+        """
+        return self.ColouredCircles[number]
+
+    def RemoveColouredCircle(self, number):
+        """
+        """
+        del self.ColouredCircles[number]
 
     @staticmethod
     def FromXml(soup):

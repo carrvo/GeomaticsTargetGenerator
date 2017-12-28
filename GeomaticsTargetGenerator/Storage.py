@@ -36,11 +36,16 @@ class TargetFile(object):
     def LoadTargetDefinition(self):
         """
         """
-        filename = self.name(TargetFile.TDEF)
-        with open(filename, mode='rt', encoding='utf-8') as file:
-            tdef = file.read()
-        soup = BeautifulSoup(tdef, PARSER)
-        return TargetDefinition.FromXml(soup)
+        try:
+            filename = self.name(TargetFile.TDEF)
+            with open(filename, mode='rt', encoding='utf-8') as file:
+                tdef = file.read()
+            soup = BeautifulSoup(tdef, PARSER)
+            return TargetDefinition.FromXml(soup)
+        except FileNotFoundError:
+            print('Not found - New Target Definition will be created')
+            radius = input('Please enter max radius:')
+            return TargetDefinition(radius)
 
     def SaveTargetDefinition(self, targetdefinition):
         """
