@@ -36,14 +36,21 @@ class TargetFile(object):
         return '.'.join([location, filetype])
 
     @staticmethod
+    def TargetDirectory():
+        """
+        Gives the absolute path of where the Targets are stored.
+        """
+        return os.path.abspath(TargetFile.STORAGE_LOCATION)
+
+    @staticmethod
     def AvailableNames():
         """
         Set of all available files.
         """
-        target_directory = os.path.abspath(TargetFile.STORAGE_LOCATION)
+        target_directory = TargetFile.TargetDirectory()
         return {name.split('.')[0] if os.path.isfile(os.path.join(target_directory, name)) for name in os.listdir(target_directory) }
 
-    def LoadTargetDefinition(self):
+    def LoadTargetDefinition(self, NotFoundMaxRadius=None):
         """
         """
         try:
@@ -54,7 +61,10 @@ class TargetFile(object):
             return TargetDefinition.FromXml(soup)
         except FileNotFoundError:
             print('Not found - New Target Definition will be created')
-            radius = input('Please enter max radius:')
+            if NotFoundMaxRadius:
+                radius = NotFoundMaxRadius
+            else:
+                radius = input('Please enter max radius:')
             return TargetDefinition(radius)
 
     def SaveTargetDefinition(self, targetdefinition):

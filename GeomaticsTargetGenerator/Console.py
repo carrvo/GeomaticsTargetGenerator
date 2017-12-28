@@ -95,7 +95,7 @@ class Console(Cmd):
         """
         self.current_file = TargetFile(arg)
         if arg in self.names:
-            self.current_file.LoadTargetDefinition()
+            self.current_target_definition = self.current_file.LoadTargetDefinition()
         else:
             print('New File:', arg)
             self.names.update(arg)
@@ -134,16 +134,16 @@ class Console(Cmd):
         """
         Modifies:
             - BarCode [+ ring level ordered outward]
-            - Max Radius [+ new value]
-            - Coloured Circle (future).
+            - MaxRadius [+ new value]
+            - ColouredCircle (future).
         """
-        arg = arg.lower()
-        if arg[:7] == 'barcode':
+        arg[0] = arg[0].lower()
+        if arg[0] == 'barcode':
             self.subcommand = self.sub_barcode
             self.subcommand_state = self.current_target_definition.RemoveFrom(int(arg[7:]))
-        elif arg[:10] == 'max radius':
+        elif arg[0] == 'maxradius':
             self.current_target_definition.ChangeMaxRadius(float(arg[10:]))
-        #elif arg == 'coloured circle':
+        #elif arg[0] == 'colouredcircle':
             #self.current_target_definition.GetColouredCircle(##)
         self.subcommand(self, None, '')
 
@@ -161,7 +161,10 @@ class Console(Cmd):
         elif cmd == 'inner-outer':
             current.ChangeRadii(float(arg[0]), float(arg[1]))
         elif cmd == 'angles':
-            current.ChangeAngles([float(angle) for angle in arg])
+            current.ChangeAngles(
+                [float(angle) if angle.find('=') == -1 for angle in arg],
+                angular_units= arg[-1].split('=')[1] if arg[-1].find('=') != -1 else 'radians'
+            )
         elif cmd == 'code':
             current.ChangeCode(int(arg))
         elif cmd == 'previous':
@@ -183,7 +186,8 @@ class Console(Cmd):
                 inner <value> - changes the Inner Radius (%)
                 outer <value> - changes the Outer Radius (%)
                 inner-outer <value> <value> - changes both radii
-                angles <value> [<value> [...]] - changes the code
+                angles <value> [<value> [...]] [angular_units=radians]
+                    - changes the code
                 code <value> - (future) changes the code
                 previous - edit previous, inward, BarCode
                 remove - removes the current BarCode
@@ -195,9 +199,13 @@ class Console(Cmd):
     def do_addbarcode(self, arg):
         """
         Adds a BarCode to the current Definition.
-        addbarcode <inner radius> <outer radius> <angle> [<angle> [...]]
+        addbarcode <inner radius> <outer radius> <angle> [<angle> [...]] [kwarg=value [...]]
         """
-        self.current_target_definition.Add(BarCode(*tuple(arg)))
+        #args = (a if a.find('=') == -1 for a in arg)
+        #kwargs = {a.split('=')[0]:a.split('=')[1] if a.find('=') != -1 for a in arg}
+        args = (float(arg[0]), float(arg[1]), [float(a) if a.find('=') == -1 for a in arg[2:]])
+        kwargs = {a.split('=')[0]:a.split('=')[1] if a.find('=') != -1 for a in arg[3:]}
+        self.current_target_definition.Add(BarCode(*args, **kwargs))
 
     def do_addcode(self, arg):
         """

@@ -13,7 +13,7 @@ class BarCode(object):
     """
     """
 
-    def __init__(self, inner_radius, outer_radius, angles, coded=False):
+    def __init__(self, inner_radius, outer_radius, angles, angular_units='radians', coded=False):
         """
         Initializes.
         if coded then angles is the input code.
@@ -22,7 +22,7 @@ class BarCode(object):
         if coded:
             self.ChangeCode(angles)
         else:
-            self.ChangeAngles(angles)
+            self.ChangeAngles(angles, angular_units=angular_units)
 
     def Width(self):
         """
@@ -40,10 +40,12 @@ class BarCode(object):
         self.InnerRadius = inner_radius
         self.OuterRadius = outer_radius
 
-    def ChangeAngles(self, angles):
+    def ChangeAngles(self, angles, angular_units='radians'):
         """
         Changes the angles and performs check that make a full circle.
         """
+        if angular_units == 'degrees':
+            angles = [angle / 180 * math.pi for angle in angles]
         assert sum(angles) == 2 * math.pi, "Must have total angles be a full circle."
         self.Angles = angles
 
