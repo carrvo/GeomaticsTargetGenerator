@@ -30,12 +30,14 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """
+        Sets up TestCase variables.
         """
         cls.TestFile = 'testing'
 
     @classmethod
     def tearDownClass(cls):
         """
+        Tears down TestCase variables.
         """
         directory = TargetFile.TargetDirectory()
         for filename in os.listdir(directory):
@@ -44,24 +46,46 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
 
     def setUp(self):
         """
+        Sets up each Test.
         """
         self.target_file = TargetFile(TargetDefinitionLifeCycle.TestFile)
         self.target_definition = self.target_file.LoadTargetDefinition(100)
 
     def tearDown(self):
         """
+        Tears down each Test.
+        """
+        pass
+
+    def setUpSubtest(self):
+        """
+        Sets up each Subtest.
+        """
+        pass
+
+    def tearDownSubtest(self):
+        """
+        Tears down each Subtest.
         """
         pass
 
     def _subtests(self):
+        """
+        Yields all subtests based on the pattern 'subtest_*'.
+        """
         for name in sorted(dir(self)):
             if name.startswith("subtest_"):
                 yield name, getattr(self, name)
 
     def test_steps(self):
+        """
+        Runs all subtests returned by self._subtests.
+        """
         for name, subtest in self._subtests():
             with self.subTest(name=name):
+                self.setUpSubtest()
                 subtest()
+                self.tearDownSubtest()
 
     def subtest_1(self):
         """
@@ -84,7 +108,7 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
         self.target_definition.ChangeMaxRadius(50)
         barcode = BarCode(5, 10, [360], angular_units='degrees')
         self.target_definition.Add(barcode)
-        barcode = BarCode(15, 25, [90,90,90,90], angular_units='degrees')
+        barcode = BarCode(15, 25, [90, 90, 90, 90], angular_units='degrees')
         self.target_definition.Add(barcode)
         self.assertTrue(True)
 
@@ -115,3 +139,11 @@ class TargetDefinitionLifeCycle(unittest.TestCase):
         console = Console(stdin=commands)
         console.cmdloop() #Do not see file when forced not remove from tearDownClass
         self.assertTrue(os.path.isfile(self.target_file.name(TargetFile.TDEF)))
+
+    def subtest_6(self):
+        """
+        Tests completed execution of the removal of a Target.
+        """
+        self.assertTrue(os.path.isfile(self.target_file.name(TargetFile.TDEF)))
+        self.target_file.Remove()
+        self.assertFalse(os.path.isfile(self.target_file.name(TargetFile.TDEF)))

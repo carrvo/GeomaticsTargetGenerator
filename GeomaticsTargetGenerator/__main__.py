@@ -18,6 +18,8 @@ from __pip__ import install
 
 INTERACTIVE_DOC = """
 PRECEDENCE:
+dependencies
+remove
 names
 interactive/commands/file
 preview
@@ -26,27 +28,33 @@ print
 
 arguments = ArgumentParser(description=DOC+INTERACTIVE_DOC)
 arguments.add_argument('-a', '--names', action='store_true',
-                        help="Print the names of available files")
+                       help="Print the names of available files")
 arguments.add_argument('-p', '--preview', action='store', type=str,
-                        help="(future) Creates a preview file")
+                       help="(future) Creates a preview file")
 arguments.add_argument('-P', '--print', action='store', type=str,
-                        help="(future) Creates a printable file")
+                       help="(future) Creates a printable file")
 arguments.add_argument('-i', '--interactive', action='store_true',
-                        help="Run Interactive Console")
+                       help="Run Interactive Console")
 arguments.add_argument('-c', '--commands', action='store', nargs='+',
-                        help="Runs commands instead")
+                       help="Runs commands instead")
 arguments.add_argument('-F', '--file', action='store',
-                        type=lambda name: open(name, 'rt', encoding='utf-8'),
-                        help="Use commands from a file")
+                       type=lambda name: open(name, 'rt', encoding='utf-8'),
+                       help="Use commands from a file")
+arguments.add_argument('-r', '--remove', action='store',
+                       help="Removes all associated files")
 arguments.add_argument('-D', '--dependencies', action='store_true',
-                        help="Install dependencies through pip")
+                       help="Install dependencies through pip")
 
-if __name__ == '__main__':
-    args = arguments.parse_args()
+def main(args):
+    """
+    Runs shell commands.
+    """
     if args.dependencies:
         install()
         from GeomaticsTargetGenerator import *
         from GeomaticsTargetGenerator.Console import Console
+    if args.remove:
+        TargetFile(args.remove).Remove()
     if args.names:
         for name in TargetFile.AvailableNames():
             print(name)
@@ -60,10 +68,13 @@ if __name__ == '__main__':
     if console:
         console.cmdloop()
     if args.preview:
-        file = Storage(args.preview)
+        file = TargetFile(args.preview)
         target_definition = file.LoadTargetDefinition()
-        file.SavePreview(targetdefinition)
+        file.SavePreview(target_definition)
     if args.print:
-        file = Storage(args.print)
+        file = TargetFile(args.print)
         target_definition = file.LoadTargetDefinition()
         file.SaveForPrint(target_definition)
+
+if __name__ == '__main__':
+    main(arguments.parse_args())

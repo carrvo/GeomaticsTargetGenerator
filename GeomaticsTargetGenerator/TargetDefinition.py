@@ -1,6 +1,5 @@
 """
 
-NOTE: asserts to be replaced with other Error Types.
 """
 
 import math
@@ -11,6 +10,7 @@ PARSER = "xml"#from .Storage import PARSER
 
 class BarCode(object):
     """
+    Represents a ring with an alternating black and white code.
     """
 
     def __init__(self, inner_radius, outer_radius, angles, angular_units='radians', coded=False):
@@ -34,9 +34,12 @@ class BarCode(object):
         """
         Changes the Inner Radus and Outer Radius.
         """
-        assert 0 < inner < 100, "InnerRadius cannot be negative or exceed 100%."
-        assert 0 < outer <= 100, "OuterRadius cannot be negative or exceed 100%."
-        assert outer > inner, "Must have radii increase."
+        if not 0 < inner < 100:
+            raise ValueError("InnerRadius cannot be negative or exceed 100%.")
+        if not 0 < outer <= 100:
+            raise ValueError("OuterRadius cannot be negative or exceed 100%.")
+        if not outer > inner:
+            raise IndexError("Must have radii increase.")
         self.InnerRadius = inner
         self.OuterRadius = outer
 
@@ -46,13 +49,15 @@ class BarCode(object):
         """
         if angular_units == 'degrees':
             angles = [angle / 180 * math.pi for angle in angles]
-        assert sum(angles) == 2 * math.pi, "Must have total angles be a full circle."
+        if not sum(angles) == 2 * math.pi:
+            raise ValueError("Must have total angles be a full circle.")
         self.Angles = angles
 
     def ChangeCode(self, code):
         """
+        Changes the angles based on a code instead of manual.
         """
-        pass #TODO
+        raise NotImplementedError() #TODO
 
     def __repr__(self):
         """
@@ -73,6 +78,7 @@ class BarCode(object):
 
 class TargetDefinition(object):
     """
+    Represents a Target and all data needed to build a target.
     """
 
     def __init__(self, max_radius):
@@ -85,25 +91,31 @@ class TargetDefinition(object):
 
     def ChangeMaxRadius(self, radius):
         """
+        Changes the outermost radius for which all others scale to.
         """
-        assert radius != 0, "Must have a radius."
+        if radius == 0:
+            raise ValueError("Must have a radius.")
         self.MaxRadius = radius
 
     def Add(self, ring):
         """
         Adds the next level of BarCode.
         """
-        assert isinstance(ring, BarCode), "Currently only support adding BarCode Instances"
+        if not isinstance(ring, BarCode):
+            raise TypeError("Currently only support adding BarCode Instances")
         if self.Cocentric: #If not empty
-            assert ring.InnerRadius > self.Cocentric[-1].OuterRadius, "Must be ordered towards the outside."
-            assert ring.Width() > self.Cocentric[-1].Width(), "Must have width increase."
+            if not ring.InnerRadius > self.Cocentric[-1].OuterRadius:
+                raise IndexError("Must be ordered towards the outside.")
+            if not ring.Width() > self.Cocentric[-1].Width():
+                raise ArithmeticError("Must have width increase.")
         self.Cocentric.append(ring)
 
     def RemoveFrom(self, ring_level):
         """
         Gets the BarCode at ring_level.
         """
-        assert self.Cocentric, "No rings."
+        if not self.Cocentric:
+            raise StopIteration("No rings.")
         ret = self.Cocentric[ring_level:]
         self.Cocentric = self.Cocentric[:ring_level]
         return ret
@@ -111,7 +123,7 @@ class TargetDefinition(object):
     def AddColouredCircle(self, ColouredCircle):
         """
         """
-        pass #TODO
+        raise NotImplementedError() #TODO
 
     def GetColouredCircle(self, number):
         """
@@ -131,8 +143,14 @@ class TargetDefinition(object):
         definition = TargetDefinition(float(soup.TargetDefinition['max_radius']))
         for ring in soup.TargetDefinition.BarCodes.find_all("BarCode", recursive=False): #...BarCodes.children but not NavigableString
             #Supports radians and degrees
-            angles = [ float(angle.string) if angle['units'] == 'radians' else float(angle.string) / 180 * math.pi for angle in ring.find_all("angle", recursive=False) ] #ring.children but not NavigableString
-            definition.Add(BarCode(float(ring['inner_radius']), float(ring['outer_radius']), angles))
+            angles = [
+                float(angle.string)
+                if angle['units'] == 'radians' else float(angle.string) / 180 * math.pi
+                for angle in ring.find_all("angle", recursive=False) #ring.children but not NavigableString
+            ]
+            definition.Add(
+                BarCode(float(ring['inner_radius']), float(ring['outer_radius']), angles)
+            )
         for circle in soup.TargetDefinition.ColouredCircles.find_all("ColouredCircle"):
             pass #definition.AddColouredCircle()
         return definition

@@ -8,17 +8,17 @@ def Previewable(targetdefinition):
     """
     Converts a TargetDefinition to a Vector Image File to be saved and previewed.
     """
-    pass #TODO
+    raise NotImplementedError() #TODO
 
 def Printable(vectorimage):
     """
     Converts a Vector Image File to a Raster Image File for a printer.
     NOTE: this depends on printer properties.
     """
-    pass #TODO
+    raise NotImplementedError() #TODO
 
 def PreviewData(vectorimage):
     """
     Converts a Vector Image File to a TargetDefinition
     """
-    pass #TODO
+    raise NotImplementedError() #TODO

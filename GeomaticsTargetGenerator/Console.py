@@ -57,9 +57,8 @@ class Console(Cmd):
     onecmd.__doc__ = Cmd.onecmd.__doc__
 
     def default(self, line):
-        """
-        """
         super().default(line)
+    default.__doc__ = Cmd.__doc__
 
     def emptyline(self):
         """
@@ -138,6 +137,10 @@ class Console(Cmd):
             self.current_file = None
             self.current_target_definition = None
 
+    def do_remove(self, arg):
+        self.current_file.Remove()
+    do_remove.__doc__ = TargetFile.Remove.__doc__
+
     def do_modify(self, arg):
         """
         Modifies:
@@ -213,7 +216,7 @@ class Console(Cmd):
         #args = (a if a.find('=') == -1 for a in arg)
         #kwargs = {a.split('=')[0]:a.split('=')[1] if a.find('=') != -1 for a in arg}
         args = (float(arg[0]), float(arg[1]), [float(a) for a in arg[2:] if a.find('=') == -1])
-        kwargs = {a.split('=')[0]:a.split('=')[1]for a in arg[3:] if a.find('=') != -1 }
+        kwargs = {a.split('=')[0]:a.split('=')[1]for a in arg[3:] if a.find('=') != -1}
         self.current_target_definition.Add(BarCode(*args, **kwargs))
 
     def do_addcode(self, arg):
