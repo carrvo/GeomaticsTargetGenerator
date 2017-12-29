@@ -10,7 +10,7 @@ try:
 except ImportError:
     import __context__
 try:
-    from GeomaticsTargetGenerator import *
+    from GeomaticsTargetGenerator import BarCode, TargetDefinition, TargetFile, DOC
     from GeomaticsTargetGenerator.Console import Console
 except ImportError:
     DOC = "MISSING DEPENDENCIES -- PLEASE RUN 'python GeomaticsTargetGenerator -D' FIRST"
@@ -45,13 +45,14 @@ arguments.add_argument('-r', '--remove', action='store',
 arguments.add_argument('-D', '--dependencies', action='store_true',
                        help="Install dependencies through pip")
 
-def main(args):
+if __name__ == '__main__':
     """
     Runs shell commands.
     """
+    args = arguments.parse_args()
     if args.dependencies:
         install()
-        from GeomaticsTargetGenerator import *
+        from GeomaticsTargetGenerator import BarCode, TargetDefinition, TargetFile
         from GeomaticsTargetGenerator.Console import Console
     if args.remove:
         TargetFile(args.remove).Remove()
@@ -75,6 +76,3 @@ def main(args):
         file = TargetFile(args.print)
         target_definition = file.LoadTargetDefinition()
         file.SaveForPrint(target_definition)
-
-if __name__ == '__main__':
-    main(arguments.parse_args())
