@@ -59,11 +59,35 @@ class BarCode(object):
         """
         raise NotImplementedError() #TODO
 
-    def __repr__(self):
+    def __repr__(self, new_tag, angular_units='radians'):
         """
+        Converts object to Tag object in soup.
+
         Machine representation of object.
+        Used to recreate object.
         """
-        super().__repr__() #TODO?
+        ring_tag = new_tag("BarCode", inner_radius=self.InnerRadius, outer_radius=self.OuterRadius)
+        for angle in self.Angles:
+            angle_tag = new_tag("angle", units=angular_units)
+            if angular_units == 'radians':
+                angle_tag.string = str(angle)
+            else: #degrees
+                angle_tag.string = str(angle / math.pi * 180)
+            ring_tag.append(angle_tag)
+        return ring_tag
+
+    @staticmethod
+    def __eval__(tag):
+        """
+        Recreate object from Tag object in a soup.
+        """
+        #Supports radians and degrees
+        angles = [
+            float(angle.string)
+            if angle['units'] == 'radians' else float(angle.string) / 180 * math.pi
+            for angle in tag.find_all("angle", recursive=False) #ring.children but not NavigableString
+        ]
+        return BarCode(float(tag['inner_radius']), float(tag['outer_radius']), angles)
 
     def __str__(self):
         """
@@ -136,44 +160,60 @@ class TargetDefinition(object):
         del self.ColouredCircles[number]
 
     @staticmethod
-    def FromXml(soup):
+    def __eval__(soup):
         """
         Converts a BeautifulSoup XML format to a TargetDefinition.
         """
         definition = TargetDefinition(float(soup.TargetDefinition['max_radius']))
         for ring in soup.TargetDefinition.BarCodes.find_all("BarCode", recursive=False): #...BarCodes.children but not NavigableString
-            #Supports radians and degrees
-            angles = [
-                float(angle.string)
-                if angle['units'] == 'radians' else float(angle.string) / 180 * math.pi
-                for angle in ring.find_all("angle", recursive=False) #ring.children but not NavigableString
-            ]
-            definition.Add(
-                BarCode(float(ring['inner_radius']), float(ring['outer_radius']), angles)
-            )
+            definition.Add(BarCode.__eval__(ring))
         for circle in soup.TargetDefinition.ColouredCircles.find_all("ColouredCircle"):
             pass #definition.AddColouredCircle()
         return definition
 
-    def ToXml(self, angular_units='radians'):
+    @staticmethod
+    def FromXml(soup):
+        return TargetDefinition.__eval__(soup)
+    FromXml.__doc__ = __eval__.__doc__
+
+    def __repr__(self, angular_units='radians'):
         """
-        Converts TargetDefinition to a BeautifulSoup XML format.
+
+        Machine representation of object.
+        Used to recreate object.
         """
         soup = BeautifulSoup("", PARSER)
         new_tag = soup.new_tag
         soup.append(new_tag("TargetDefinition", max_radius=self.MaxRadius))
         soup.TargetDefinition.append(new_tag("BarCodes"))
         for ring in self.Cocentric:
-            ring_tag = new_tag("BarCode", inner_radius=ring.InnerRadius, outer_radius=ring.OuterRadius)
-            for angle in ring.Angles:
-                angle_tag = new_tag("angle", units=angular_units)
-                if angular_units == 'radians':
-                    angle_tag.string = str(angle)
-                else: #degrees
-                    angle_tag.string = str(angle / math.pi * 180)
-                ring_tag.append(angle_tag)
-            soup.TargetDefinition.BarCodes.append(ring_tag)
+            soup.TargetDefinition.BarCodes.append(ring.__repr__(new_tag, angular_units))
         soup.TargetDefinition.append(new_tag("ColouredCircles"))
         for circle in self.ColouredCircles:
             pass #
         return soup
+
+    def ToXml(self, angular_units='radians'):
+        """
+        Converts TargetDefinition to a BeautifulSoup XML format.
+        """
+        return self.__repr__(angular_units)
+    __repr__.__doc__ = ToXml.__doc__ + __repr__.__doc__
+
+    def __str__(self):
+        """
+        Human readable representation of object.
+        """
+        return '''
+            MaxRadius = {}
+
+            BarCode rings:
+            {}
+
+            ColouredCircles:
+            {}
+        '''.format(
+            self.MaxRadius,
+            '\n'.join([str(ring) for ring in self.Cocentric]),
+            '\n'.join([str(circle) for circle in self.ColouredCircles])
+        )
