@@ -1,5 +1,5 @@
 """
-This module specifies commandline usage.
+This module specifies shell usage.
 """
 
 from argparse import ArgumentParser
@@ -9,8 +9,12 @@ try:
     from . import __context__
 except ImportError:
     import __context__
-from GeomaticsTargetGenerator import *
-from GeomaticsTargetGenerator.Console import Console
+try:
+    from GeomaticsTargetGenerator import *
+    from GeomaticsTargetGenerator.Console import Console
+except ImportError:
+    DOC = "MISSING DEPENDENCIES -- PLEASE RUN 'python GeomaticsTargetGenerator -D' FIRST"
+from __pip__ import install
 
 INTERACTIVE_DOC = """
 PRECEDENCE:
@@ -34,9 +38,15 @@ arguments.add_argument('-c', '--commands', action='store', nargs='+',
 arguments.add_argument('-F', '--file', action='store',
                         type=lambda name: open(name, 'rt', encoding='utf-8'),
                         help="Use commands from a file")
+arguments.add_argument('-D', '--dependencies', action='store_true',
+                        help="Install dependencies through pip")
 
 if __name__ == '__main__':
     args = arguments.parse_args()
+    if args.dependencies:
+        install()
+        from GeomaticsTargetGenerator import *
+        from GeomaticsTargetGenerator.Console import Console
     if args.names:
         for name in TargetFile.AvailableNames():
             print(name)
