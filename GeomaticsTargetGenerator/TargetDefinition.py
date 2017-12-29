@@ -103,8 +103,9 @@ class TargetDefinition(object):
         """
         Gets the BarCode at ring_level.
         """
+        assert self.Cocentric, "No rings."
         ret = self.Cocentric[ring_level:]
-        self.Cocentric[:ring_level]
+        self.Cocentric = self.Cocentric[:ring_level]
         return ret
 
     def AddColouredCircle(self, ColouredCircle):

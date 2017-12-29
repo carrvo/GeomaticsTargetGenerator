@@ -3,6 +3,7 @@ This module deals with interactive console editing.
 """
 
 from cmd import Cmd
+import traceback
 
 from .__init__ import *
 
@@ -42,18 +43,23 @@ class Console(Cmd):
         """
         return line
 
+    def onecmd(self, line):
+        try:
+            if self.subcommand:
+                cmd, arg, line = self.parseline(line)
+                return self.subcommand(cmd, arg)
+            else:
+                return super().onecmd(line)
+        except Exception:
+            traceback.print_exc()
+            print()
+            super().default(line)
+    onecmd.__doc__ = Cmd.onecmd.__doc__
+
     def default(self, line):
         """
         """
-        if self.subcommand:
-            if self.subcommand_state:
-                cmd, arg, line = self.parseline(line)
-                self.subcommand(cmd, arg)
-            else: #Subcommand is done
-                self.prompt = self.primary_prompt
-                self.subcommand = None
-        else:
-            super().default(line)
+        super().default(line)
 
     def emptyline(self):
         """
@@ -65,6 +71,9 @@ class Console(Cmd):
         """
         Determines when the Interpreter loop stops.
         """
+        if not self.subcommand_state: #Subcommand is done
+            self.prompt = self.primary_prompt
+            self.subcommand = None
         if self.subcommand:
             self.prompt = self.secondary_prompt
         return stop or line == 'EOF'
@@ -94,11 +103,10 @@ class Console(Cmd):
         If file does not exist then creates a new one.
         """
         self.current_file = TargetFile(arg)
-        if arg in self.names:
-            self.current_target_definition = self.current_file.LoadTargetDefinition()
-        else:
+        if arg not in self.names:
             print('New File:', arg)
             self.names.update(arg)
+        self.current_target_definition = self.current_file.LoadTargetDefinition()
 
     def do_save(self, arg):
         """
@@ -140,12 +148,13 @@ class Console(Cmd):
         arg[0] = arg[0].lower()
         if arg[0] == 'barcode':
             self.subcommand = self.sub_barcode
-            self.subcommand_state = self.current_target_definition.RemoveFrom(int(arg[7:]))
+            self.subcommand_state = self.current_target_definition.RemoveFrom(int(arg[1]))
         elif arg[0] == 'maxradius':
-            self.current_target_definition.ChangeMaxRadius(float(arg[10:]))
+            self.current_target_definition.ChangeMaxRadius(float(arg[1]))
         #elif arg[0] == 'colouredcircle':
             #self.current_target_definition.GetColouredCircle(##)
-        self.subcommand(self, None, '')
+        if self.subcommand:
+            self.subcommand(None, '')
 
     def sub_barcode(self, cmd, arg):
         """
@@ -168,7 +177,7 @@ class Console(Cmd):
         elif cmd == 'code':
             current.ChangeCode(int(arg))
         elif cmd == 'previous':
-            self.subcommand_state = [ self.current_target_definition.RemoveFrom(-1) ] + self.subcommand_state
+            self.subcommand_state = self.current_target_definition.RemoveFrom(-1) + self.subcommand_state
         elif cmd == 'remove':
             self.subcommand_state = self.subcommand_state[1:]
         elif cmd == 'next':
@@ -176,7 +185,7 @@ class Console(Cmd):
             self.subcommand_state = self.subcommand_state[1:]
         elif cmd == 'done':
             for state in self.subcommand_state:
-                self.current_target_definition.Add(current)
+                self.current_target_definition.Add(state)
             self.subcommand_state = []
         else:
             print("""
@@ -217,12 +226,13 @@ class Console(Cmd):
     def do_circles(self, arg):
         """
         (future)
+        ! Move to under do_modify !
         """
         self.subcommand = self.sub_circles
         self.subcommand_state = 'editing'
-        self.subcommand(self, None, '')
+        self.subcommand(None, '')
 
-    def sub_circles(self, arg):
+    def sub_circles(self, cmd, arg):
         """
         (future)
             - add

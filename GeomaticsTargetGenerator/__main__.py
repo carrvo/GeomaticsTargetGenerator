@@ -5,8 +5,12 @@ This module specifies commandline usage.
 from argparse import ArgumentParser
 from io import StringIO
 
-from .__init__ import *
-from .Console import Console
+try:
+    from . import __context__
+except ImportError:
+    import __context__
+from GeomaticsTargetGenerator import *
+from GeomaticsTargetGenerator.Console import Console
 
 INTERACTIVE_DOC = """
 PRECEDENCE:
@@ -27,14 +31,14 @@ arguments.add_argument('-i', '--interactive', action='store_true',
                         help="Run Interactive Console")
 arguments.add_argument('-c', '--commands', action='store', nargs='+',
                         help="Runs commands instead")
-arguments.add_argument('-F' '--file', action='store',
-                        type=lambda name: open(name, 'rt', encoding='utf-8')
+arguments.add_argument('-F', '--file', action='store',
+                        type=lambda name: open(name, 'rt', encoding='utf-8'),
                         help="Use commands from a file")
 
 if __name__ == '__main__':
     args = arguments.parse_args()
     if args.names:
-        for name in Storage.AvailableNames():
+        for name in TargetFile.AvailableNames():
             print(name)
     console = None
     if args.interactive:
