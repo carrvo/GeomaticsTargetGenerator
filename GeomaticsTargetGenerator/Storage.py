@@ -29,19 +29,22 @@ class TargetFile(object):
         """
         self.filename = filename
 
-    def name(self, filetype):
+    def name(self, filetype, localdir=False):
         """
         Returns the full path and file name.
         """
-        location = '\\'.join([TargetFile.TargetDirectory(), self.filename])
+        location = '\\'.join([TargetFile.TargetDirectory(localdir), self.filename])
         return '.'.join([location, filetype])
 
     @staticmethod
-    def TargetDirectory():
+    def TargetDirectory(localdir=False):
         """
         Gives the absolute path of where the Targets are stored.
         """
-        return os.path.abspath(TargetFile.STORAGE_LOCATION)
+        if localdir:
+            return os.path.abspath(os.curdir)
+        else:
+            return os.path.abspath(TargetFile.STORAGE_LOCATION)
 
     @staticmethod
     def AvailableNames():
@@ -101,21 +104,21 @@ class TargetFile(object):
         with open(filename, mode='wb') as file:
             file.write(preview)
 
-    def SaveForPrint(self, targetdefinition):
+    def SaveForPrint(self, targetdefinition, localdir=False):
         """
         Saves a TargetDefinition to a {} file.
         """.format(TargetFile.RASTER_IMAGE)
-        filename = self.name(TargetFile.RASTER_IMAGE)
+        filename = self.name(TargetFile.RASTER_IMAGE, localdir)
         preview = Previewable(targetdefinition)
         printing = Printable(preview)
         with open(filename, mode='wb') as file:
             file.write(printing)
 
-    def ConvertToPrint(self):
+    def ConvertToPrint(self, localdir=False):
         """
         Converts a {} file to a {} file.
         """.format(TargetFile.VECTOR_IMAGE, TargetFile.RASTER_IMAGE)
-        filename = self.name(TargetFile.VECTOR_IMAGE)
+        filename = self.name(TargetFile.VECTOR_IMAGE, localdir)
         with open(filename, mode='rb') as file:
             preview = file.read()
         filename = self.name(TargetFile.RASTER_IMAGE)

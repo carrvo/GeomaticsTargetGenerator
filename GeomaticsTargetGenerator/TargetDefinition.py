@@ -6,6 +6,8 @@ import math
 
 from bs4 import BeautifulSoup
 
+from .__magic__ import crepr, ceval
+
 PARSER = "xml"#from .Storage import PARSER
 
 class BarCode(object):
@@ -59,12 +61,9 @@ class BarCode(object):
         """
         raise NotImplementedError() #TODO
 
-    def __repr__(self, new_tag, angular_units='radians'):
+    def _c__repr__(self, new_tag, angular_units='radians'):
         """
         Converts object to Tag object in soup.
-
-        Machine representation of object.
-        Used to recreate object.
         """
         ring_tag = new_tag("BarCode", inner_radius=self.InnerRadius, outer_radius=self.OuterRadius)
         for angle in self.Angles:
@@ -77,7 +76,7 @@ class BarCode(object):
         return ring_tag
 
     @staticmethod
-    def __eval__(tag):
+    def _c__eval__(tag):
         """
         Recreate object from Tag object in a soup.
         """
@@ -160,34 +159,32 @@ class TargetDefinition(object):
         del self.ColouredCircles[number]
 
     @staticmethod
-    def __eval__(soup):
+    def _c__eval__(soup):
         """
         Converts a BeautifulSoup XML format to a TargetDefinition.
         """
         definition = TargetDefinition(float(soup.TargetDefinition['max_radius']))
         for ring in soup.TargetDefinition.BarCodes.find_all("BarCode", recursive=False): #...BarCodes.children but not NavigableString
-            definition.Add(BarCode.__eval__(ring))
+            definition.Add(ceval(BarCode, ring))
         for circle in soup.TargetDefinition.ColouredCircles.find_all("ColouredCircle"):
             pass #definition.AddColouredCircle()
         return definition
 
     @staticmethod
     def FromXml(soup):
-        return TargetDefinition.__eval__(soup)
-    FromXml.__doc__ = __eval__.__doc__
+        return ceval(TargetDefinition, soup)
+    FromXml.__doc__ = _c__eval__.__doc__
 
-    def __repr__(self, angular_units='radians'):
+    def _c__repr__(self, angular_units='radians'):
         """
-
-        Machine representation of object.
-        Used to recreate object.
+        Converts into soup document.
         """
         soup = BeautifulSoup("", PARSER)
         new_tag = soup.new_tag
         soup.append(new_tag("TargetDefinition", max_radius=self.MaxRadius))
         soup.TargetDefinition.append(new_tag("BarCodes"))
         for ring in self.Cocentric:
-            soup.TargetDefinition.BarCodes.append(ring.__repr__(new_tag, angular_units))
+            soup.TargetDefinition.BarCodes.append(crepr(ring, new_tag, angular_units))
         soup.TargetDefinition.append(new_tag("ColouredCircles"))
         for circle in self.ColouredCircles:
             pass #
@@ -197,8 +194,7 @@ class TargetDefinition(object):
         """
         Converts TargetDefinition to a BeautifulSoup XML format.
         """
-        return self.__repr__(angular_units)
-    __repr__.__doc__ = ToXml.__doc__ + __repr__.__doc__
+        return crepr(self, angular_units)
 
     def __str__(self):
         """
