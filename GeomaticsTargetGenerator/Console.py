@@ -5,7 +5,7 @@ This module deals with interactive console editing.
 from cmd import Cmd
 import traceback
 
-from .__init__ import *
+from .__api__ import API
 
 class Console(Cmd):
     """
@@ -22,9 +22,8 @@ class Console(Cmd):
         self.prompt = self.primary_prompt
         self.subcommand = None
         self.subcommand_state = None
-        self.current_file = None
-        self.current_target_definition = None
-        self.available_names()
+        self.api = API()
+        self.names = self.api.AvailableNames() #Buffers available file names.
 
     def parseline(self, line):
         cmd, arg, line = super().parseline(line)
@@ -83,12 +82,6 @@ class Console(Cmd):
         """
         return True
 
-    def available_names(self):
-        """
-        Buffers available file names.
-        """
-        self.names = TargetFile.AvailableNames()
-
     def do_names(self, arg):
         """
         Lists all the available file names.
@@ -97,49 +90,23 @@ class Console(Cmd):
             print(name)
 
     def do_load(self, arg):
-        """
-        Loads file for current editing.
-        If file does not exist then creates a new one.
-        """
-        self.current_file = TargetFile(arg)
+        self.api.load(arg)
         if arg not in self.names:
             print('New File:', arg)
-            self.names.update(arg)
-        self.current_target_definition = self.current_file.LoadTargetDefinition()
+            self.names.update({arg})
+    do_load.__doc__ = API.load.__doc__
 
     def do_save(self, arg):
-        """
-        Saves the current Definition into the current file.
-        Default is to save as Definition file.
-        Options: Definition, Prievew (future), Print (future)
-        """
-        arg = arg.lower()
-        if False:
-            pass
-        #elif arg == 'preview':
-            #self.current_file.SavePreview(self.current_target_definition)
-        #elif arg == 'print':
-            #self.current_file.SaveForPrint(self.current_target_definition)
-        else: #Definition
-            self.current_file.SaveTargetDefinition(self.current_target_definition)
+        self.api.save(arg)
+    do_save.__doc__ = API.__doc__
 
     def do_clear(self, arg):
-        """
-        Clears current Definition and current file.
-        Optional: specify to clear just Definition or file.
-        """
-        arg = arg.lower()
-        if arg == 'definition':
-            self.current_target_definition = None
-        elif arg == 'file':
-            self.current_file = None
-        else:
-            self.current_file = None
-            self.current_target_definition = None
+        self.api.clear(arg)
+    do_clear.__doc__ = API.clear.__doc__
 
     def do_remove(self, arg):
-        self.current_file.Remove()
-    do_remove.__doc__ = TargetFile.Remove.__doc__
+        self.api.remove()
+    do_remove.__doc__ = API.remove.__doc__
 
     def do_modify(self, arg):
         """
@@ -148,14 +115,14 @@ class Console(Cmd):
             - MaxRadius [+ new value]
             - ColouredCircle (future).
         """
-        arg[0] = arg[0].lower()
-        if arg[0] == 'barcode':
+        mod, level = (arg[0].lower(), arg[1])
+        if mod == 'barcode':
             self.subcommand = self.sub_barcode
-            self.subcommand_state = self.current_target_definition.RemoveFrom(int(arg[1]))
-        elif arg[0] == 'maxradius':
-            self.current_target_definition.ChangeMaxRadius(float(arg[1]))
-        #elif arg[0] == 'colouredcircle':
-            #self.current_target_definition.GetColouredCircle(##)
+            self.subcommand_state = self.api.modify(mod, int(level))
+        elif mod == 'maxradius':
+            self.api.modify(mod, float(level))
+        elif mod == 'colouredcircle':
+            self.api.modify(mod, int(level)) #GetColouredCircle(level)
         if self.subcommand:
             self.subcommand(None, '')
 
@@ -180,15 +147,15 @@ class Console(Cmd):
         elif cmd == 'code':
             current.ChangeCode(int(arg))
         elif cmd == 'previous':
-            self.subcommand_state = self.current_target_definition.RemoveFrom(-1) + self.subcommand_state
+            self.subcommand_state = self.api.modify('barcode', -1) + self.subcommand_state
         elif cmd == 'remove':
             self.subcommand_state = self.subcommand_state[1:]
         elif cmd == 'next':
-            self.current_target_definition.Add(current)
+            self.api.addbarcodeobject(current)
             self.subcommand_state = self.subcommand_state[1:]
         elif cmd == 'done':
             for state in self.subcommand_state:
-                self.current_target_definition.Add(state)
+                self.api.addbarcodeobject(state)
             self.subcommand_state = []
         else:
             print("""
@@ -215,16 +182,16 @@ class Console(Cmd):
         """
         #args = (a if a.find('=') == -1 for a in arg)
         #kwargs = {a.split('=')[0]:a.split('=')[1] if a.find('=') != -1 for a in arg}
-        args = (float(arg[0]), float(arg[1]), [float(a) for a in arg[2:] if a.find('=') == -1])
+        args = (float(arg[0]), float(arg[1])) + tuple(float(a) for a in arg[2:] if a.find('=') == -1)
         kwargs = {a.split('=')[0]:a.split('=')[1]for a in arg[3:] if a.find('=') != -1}
-        self.current_target_definition.Add(BarCode(*args, **kwargs))
+        self.api.addbarcode(*args, **kwargs)
 
     def do_addcode(self, arg):
         """
         Adds a BarCode to the current Definition.
         addcode <inner radius> <outer radius> <code>
         """
-        self.current_target_definition.Add(BarCode(arg[0], arg[1], arg[2], coded=True))
+        self.api.addcode(float(arg[0]), float(arg[1]), int(arg[2]))
 
     def do_circles(self, arg):
         """

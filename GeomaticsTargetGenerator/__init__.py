@@ -2,11 +2,7 @@
 This module specifies the API.
 """
 
-from .TargetDefinition import BarCode, TargetDefinition
-from .Storage import TargetFile
+from .__api__ import BarCode, TargetDefinition, TargetFile, API, API_DOC
 
 DOC = """
-"""
-
-API = """
 """
