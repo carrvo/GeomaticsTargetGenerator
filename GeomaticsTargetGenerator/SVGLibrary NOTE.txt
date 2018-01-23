@@ -1,0 +1,5 @@
+@carrvo:
+    The SVGLibrary is a personal project not yet made public.
+    However it was started specifically for use in this project.
+
+SVGLibrary pre-v0.0
