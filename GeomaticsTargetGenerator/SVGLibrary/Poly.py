@@ -2,6 +2,7 @@
 """
 
 from .BaseSVG import BaseSVG
+from .Pair import Point
 from .__magic__ import xmlrepr, xmleval, name, check
 
 class Polyline(BaseSVG):

@@ -2,6 +2,7 @@
 """
 
 from .BaseSVG import BaseSVG
+from .Pair import Pair, Point
 
 class Rectangle(BaseSVG):
     """
@@ -35,7 +36,7 @@ class Rectangle(BaseSVG):
 
     #short-cuts
 
-    @def x():
+    def x():
         doc = "The x property."
         def fget(self):
             return self.position.x
@@ -44,7 +45,7 @@ class Rectangle(BaseSVG):
         return locals()
     x = property(**x())
 
-    @def y():
+    def y():
         doc = "The y property."
         def fget(self):
             return self.position.y
@@ -53,7 +54,7 @@ class Rectangle(BaseSVG):
         return locals()
     y = property(**y())
 
-    @def rx():
+    def rx():
         doc = "The rx property."
         def fget(self):
             return self.rounded.x
@@ -62,7 +63,7 @@ class Rectangle(BaseSVG):
         return locals()
     rx = property(**rx())
 
-    @def ry():
+    def ry():
         doc = "The ry property."
         def fget(self):
             return self.rounded.y
@@ -71,7 +72,7 @@ class Rectangle(BaseSVG):
         return locals()
     ry = property(**ry())
 
-    @def width():
+    def width():
         doc = "The width property."
         def fget(self):
             return self.size.x
@@ -80,7 +81,7 @@ class Rectangle(BaseSVG):
         return locals()
     width = property(**width())
 
-    @def height():
+    def height():
         doc = "The height property."
         def fget(self):
             return self.size.y

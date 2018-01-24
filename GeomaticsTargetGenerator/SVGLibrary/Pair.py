@@ -1,15 +1,13 @@
 """
 """
 
-from .BaseSVG import AttributeSupport
+from .AttributeSupport import AttributeSupport
 from .ErrorBuilder import ParameterError
 
 class Pair(AttributeSupport):
     """
     Represents an (x,y) pair for general use.
     """
-
-    __error__ = ParameterError.CreateError(__class__)
 
     def __init__(self, x, y):
         """
@@ -18,14 +16,14 @@ class Pair(AttributeSupport):
         #want immutable to prevent external influence
         self.__x_y__ = (x, y)
 
-    @def x():
+    def x():
         doc = "The x property."
         def fget(self):
             return self.__x_y__[0]
         return locals()
     x = property(**x())
 
-    @def y():
+    def y():
         doc = "The y property."
         def fget(self):
             return self.__x_y__[1]
@@ -41,9 +39,11 @@ class Pair(AttributeSupport):
         string = string.split(',')
         return cls(int(string[0]), int(string[1]))
     __xml_eval__.__doc__ = AttributeSupport.__xml_eval__.__doc__
+setattr(Pair, '__error__', ParameterError.CreateError(Pair))
 
 class Point(Pair):
     """
     Represents a Pair of coordinates on the image.
     """
-    __error__ = ParameterError.CreateError(__class__)
+    pass
+setattr(Point, '__error__', ParameterError.CreateError(Point))

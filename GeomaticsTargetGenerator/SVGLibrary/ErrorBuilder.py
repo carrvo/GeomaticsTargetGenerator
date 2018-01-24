@@ -32,7 +32,7 @@ class ParameterError(TypeError):
         """
         self.__parameter__ = false_parameter
 
-    @def parameter():
+    def parameter():
         doc = "The parameter property."
         def fget(self):
             return self.__parameter__

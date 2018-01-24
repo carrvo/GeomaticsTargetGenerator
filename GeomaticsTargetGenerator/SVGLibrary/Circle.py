@@ -2,6 +2,7 @@
 """
 
 from .BaseSVG import BaseSVG
+from .Pair import Point
 
 class Circle(BaseSVG):
     """
@@ -28,14 +29,14 @@ class Circle(BaseSVG):
 
     #short-cuts
 
-    @def cx():
+    def cx():
         doc = "The cx property."
         def fget(self):
             return self.center.x
         return locals()
     cx = property(**cx())
 
-    @def cy():
+    def cy():
         doc = "The cy property."
         def fget(self):
             return self.center.y

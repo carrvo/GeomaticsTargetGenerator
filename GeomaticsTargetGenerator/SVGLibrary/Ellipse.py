@@ -2,6 +2,7 @@
 """
 
 from .BaseSVG import BaseSVG
+from .Pair import Pair, Point
 
 class Ellipse(BaseSVG):
     """
@@ -27,28 +28,28 @@ class Ellipse(BaseSVG):
 
     #short-cuts
 
-    @def cx():
+    def cx():
         doc = "The cx property."
         def fget(self):
             return self.center.x
         return locals()
     cx = property(**cx())
 
-    @def cy():
+    def cy():
         doc = "The cy property."
         def fget(self):
             return self.center.y
         return locals()
     cy = property(**cy())
 
-    @def rx():
+    def rx():
         doc = "The rx property."
         def fget(self):
             return self.radius.x
         return locals()
     rx = property(**rx())
 
-    @def ry():
+    def ry():
         doc = "The ry property."
         def fget(self):
             return self.radius.y

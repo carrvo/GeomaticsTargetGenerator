@@ -2,6 +2,12 @@
 This module is for creating and printing image files from TargetDefinition.
 """
 
+try:
+    from .SVGLibrary import *
+except ImportError as error:
+    print(error)
+    error.with_traceback()
+
 from .TargetDefinition import TargetDefinition
 
 def Previewable(targetdefinition):
@@ -9,6 +15,17 @@ def Previewable(targetdefinition):
     Converts a TargetDefinition to a Vector Image File to be saved and previewed.
     """
     raise NotImplementedError() #TODO
+    svg = SVG(targetdefinition.MaxRadius, targetdefinition.MaxRadius)
+    center = int(targetdefinition.MaxRadius / 2)
+    black = Style(colour="black")
+    white = Style(colour="white")
+    for barcode in reversed(targetdefinition.Cocentric):
+        #should be percentages of max not absolute
+        svg.elements.append(Circle(center, barcode.OuterRadius, style=black))
+        svg.elements.append(Circle(center, barcode.InnerRadius, style=white))
+    for circle in targetdefinition.ColouredCircles:
+        pass #TODO
+    return xmlrepr(svg).prettify()
 
 def Printable(vectorimage):
     """

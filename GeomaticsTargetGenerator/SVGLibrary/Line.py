@@ -2,6 +2,7 @@
 """
 
 from .BaseSVG import BaseSVG
+from .Pair import Point
 
 class Line(BaseSVG):
     """
@@ -31,7 +32,7 @@ class Line(BaseSVG):
 
     #short-cuts
 
-    @def x1():
+    def x1():
         doc = "The x1 property."
         def fget(self):
             return self.position1.x
@@ -40,7 +41,7 @@ class Line(BaseSVG):
         return locals()
     x1 = property(**x1())
 
-    @def y1():
+    def y1():
         doc = "The y1 property."
         def fget(self):
             return self.position1.y
@@ -49,7 +50,7 @@ class Line(BaseSVG):
         return locals()
     y1 = property(**y1())
 
-    @def x2():
+    def x2():
         doc = "The x2 property."
         def fget(self):
             return self.position2.x
@@ -58,7 +59,7 @@ class Line(BaseSVG):
         return locals()
     x2 = property(**x2())
 
-    @def y2():
+    def y2():
         doc = "The y2 property."
         def fget(self):
             return self.position2.y

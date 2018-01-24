@@ -2,8 +2,8 @@
 """
 
 from .Style import Style
-from .__magic__ import xmlrepr, xmleval, name, tag_attrs, check
-from .Errors import TagError, ParameterError
+from .__magic__ import xmlrepr, xmleval, name, tagname, tag_attrs, check
+from .TagError import TagError
 
 class Register(type):
     def __init__(cls, name, bases, namespace):
@@ -13,26 +13,7 @@ class Register(type):
         cls.__registry__.update({tagname(cls):cls})
     # Metamethods, called on class objects:
     def __getitem__(cls, key):
-        return cls.__registry__.[key]
-
-class AttributeSupport(object):
-    """
-    This provides support for tag attributes.
-    """
-    __error__ = ParameterError
-
-    def __xml_repr__(self):
-        """
-        Converts object to string for Tag Attributes.
-        """
-        raise NotImplementedError('Must override this method!')
-
-    @classmethod
-    def __xml_eval__(cls, string):
-        """
-        Recreate object from a string originating from Tag Attributes.
-        """
-        raise NotImplementedError('Must override this method!')
+        return cls.__registry__[key]
 
 class BaseSVG(object, metaclass=Register):
     """
@@ -60,7 +41,7 @@ class BaseSVG(object, metaclass=Register):
     __tag_attrs__ = {} #'name':default
     __svg_attrs__ = {} #'name':type
 
-    def __init__(self, **kwargs, style=None):
+    def __init__(self, **kwargs):
         """
         Initializes.
         """
@@ -69,7 +50,7 @@ class BaseSVG(object, metaclass=Register):
                 setattr(self, '_' + attr, check(_type, kwargs[attr]))
             except IndexError:
                 setattr(self, '_' + attr, default(_type))
-        self.__style__ = check(Style, style)
+        self.__style__ = check(Style, kwargs.get('style', None))
         set_properties()
 
     @classmethod
@@ -79,7 +60,7 @@ class BaseSVG(object, metaclass=Register):
             making sure to type check.
         """
         for attr, _type in cls.__svg_attrs__.items():
-            @def temp():
+            def temp():
                 doc = "The {} property.".format(attr)
                 def fget(self):
                     return getattr(self, '_' + attr)
@@ -89,7 +70,7 @@ class BaseSVG(object, metaclass=Register):
             temp = property(**temp())
             setattr(cls, attr, temp)
 
-    @def style():
+    def style():
         doc = "The style property."
         def fget(self):
             return self.__style__

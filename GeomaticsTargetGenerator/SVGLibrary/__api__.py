@@ -29,7 +29,10 @@ from .Path import EllipticalArcTo, ClosePath
 from .Path import PathCommand # use them as methods instead
 
 #Errors
-import __errors__ as Errors
+from . import __errors__ as Errors
+
+#Utility functions
+from .__magic__ import xmlrepr, xmleval
 
 API_DOC = """
 """

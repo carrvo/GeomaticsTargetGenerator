@@ -16,7 +16,6 @@ class PathSegment(Point):
     """
     """
 
-    __error__ = ParameterError.CreateError(__class__)
     __command__ = None
 
     def __init__(self, x, y, isabsolute=False):
@@ -26,7 +25,7 @@ class PathSegment(Point):
         super().__init__(x, y)
         self.isabsolute = isabsolute
 
-    @def command():
+    def command():
         doc = "The command property."
         def fget(self):
             if not PathSegment.__command__:
@@ -50,6 +49,7 @@ class PathSegment(Point):
         string = string[1:].split(',')
         return PathCommand.__all__[command](int(string[0]), int(string[1]), command.isupper())
     __xml_eval__.__doc__ = Point.__xml_eval__.__doc__
+setattr(PathSegment, '__error__', ParameterError.CreateError(PathSegment))
 
 class PathSegmentCLOSE(PathSegment):
     """

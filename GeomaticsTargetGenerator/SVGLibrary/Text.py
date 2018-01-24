@@ -3,6 +3,7 @@
 
 from .BaseSVG import BaseSVG
 from .Group import Container
+from .Pair import Point
 from .__magic__ import xmlrepr, name
 
 class TSpan(BaseSVG):
@@ -25,7 +26,7 @@ class TSpan(BaseSVG):
 
     #short-cuts
 
-    @def x():
+    def x():
         doc = "The x property."
         def fget(self):
             return self.position.x
@@ -34,7 +35,7 @@ class TSpan(BaseSVG):
         return locals()
     x = property(**x())
 
-    @def y():
+    def y():
         doc = "The y property."
         def fget(self):
             return self.position.y
@@ -70,7 +71,7 @@ class Text(Container, TSpan): #favours Container
         super(TSPan, self).__init__(position, text)
         super(Container, self).__init__(subtexts)
 
-    @def subtexts():
+    def subtexts():
         doc = "The subtexts property."
         def fget(self):
             return self.elements

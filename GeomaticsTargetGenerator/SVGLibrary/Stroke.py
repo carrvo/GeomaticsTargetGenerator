@@ -3,7 +3,7 @@
 
 from collections import Iterable # nicer than checking for '__iter__' -- but str is True for both
 
-from .BaseSVG import AttributeSupport
+from .AttributeSupport import AttributeSupport
 
 class Stroke(AttributeSupport):
     """
@@ -19,7 +19,7 @@ class Stroke(AttributeSupport):
         'dashes':'stroke-dasharray'
     }
 
-    def __init__(self, colour="black", thickness=1, linecap="square", dashes=(,)):
+    def __init__(self, colour="black", thickness=1, linecap="square", dashes=tuple()):
         """
         Initializes.
         """
@@ -50,12 +50,13 @@ class Stroke(AttributeSupport):
 
     # could be separate attributes in the future
     def __xml_repr__(self):
-        return ';'.join((
-                         self.Attribute(tag, getattr(self, svg))
-                         for svg, tag in self.__svg_to_tag__.items()
-                         if not isinstance(svg, Iterable) or isinstance(svg, str) # more general
-                         else self.Attribute(tag, ','.join((getattr(self, svg))))
-                        ))
+        attrs = []
+        for svg, tag in self.__svg_to_tag__.items():
+            if not isinstance(svg, Iterable) or isinstance(svg, str): # more general
+                attrs.append(self.Attribute(tag, getattr(self, svg)))
+            else:
+                attrs.append(self.Attribute(tag, ','.join((getattr(self, svg)))))
+        return ';'.join(attrs)
     __xml_repr__.__doc__ = AttributeSupport.__xml_repr__.__doc__
 
     # could be separate attributes in the future
@@ -68,7 +69,7 @@ class Stroke(AttributeSupport):
                 name = cls.ReverseAttribute(name)
                 value = int(value) if value.isnumeric() else value
                 if value.find(',') > -1:
-                    value = (int(v) for v in value.split(',') if v.isnumeric() else v)
+                    value = (int(v) if v.isnumeric() else v for v in value.split(','))
                 setattr(obj, name, value)
             except NameError:
                 continue # log/print this?

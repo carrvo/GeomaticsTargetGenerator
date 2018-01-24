@@ -8,8 +8,6 @@ class Style(Stroke):
     """
     """
 
-    __error__ = ParameterError.CreateError(__class__)
-
     def __init__(self, *args, **kwargs):
         """
         Initializes.
@@ -38,3 +36,4 @@ class Style(Stroke):
         """
         # NEEDS TO BE CHANGED TO SUPPORT MULTIPLE SUBCLASSING
         xmleval(super(Stroke, self), tag['style'])
+setattr(Style, '__error__', ParameterError.CreateError(Style))
