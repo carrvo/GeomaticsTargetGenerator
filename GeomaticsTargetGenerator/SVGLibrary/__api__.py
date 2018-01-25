@@ -17,6 +17,7 @@ from .SVG import SVG
 
 #Support Classes
 from .Style import Style
+from .Pair import Pair, Point
 #Path Commands
 '''
 from .Path import MoveTo, LineTo

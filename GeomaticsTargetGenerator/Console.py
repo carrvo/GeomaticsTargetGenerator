@@ -98,7 +98,7 @@ class Console(Cmd):
 
     def do_save(self, arg):
         self.api.save(arg)
-    do_save.__doc__ = API.__doc__
+    do_save.__doc__ = API.save.__doc__
 
     def do_clear(self, arg):
         self.api.clear(arg)

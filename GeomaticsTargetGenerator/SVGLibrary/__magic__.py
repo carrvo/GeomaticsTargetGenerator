@@ -7,14 +7,14 @@ def xmlrepr(obj, *args, **kwargs):
     Converts to a BeautifulSoup XML format.
     Used to recreate object.
     """
-    return obj.__xml_repr__(new_tag, *args, **kwargs)
+    return obj.__xml_repr__(*args, **kwargs)
 
 def xmleval(cls, *args, **kwargs):
     """
     Converts from a BeautifulSoup XML format.
     Recreates object through static method.
     """
-    return cls.__xml_eval__(tag, *args, **kwargs)
+    return cls.__xml_eval__(*args, **kwargs)
 
 def name(obj_cls):
     """

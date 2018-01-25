@@ -2,6 +2,7 @@
 """
 
 from .Style import Style
+from .AttributeSupport import NoAttribute
 from .__magic__ import xmlrepr, xmleval, name, tagname, tag_attrs, check
 from .TagError import TagError
 
@@ -50,8 +51,14 @@ class BaseSVG(object, metaclass=Register):
                 setattr(self, '_' + attr, check(_type, kwargs[attr]))
             except IndexError:
                 setattr(self, '_' + attr, default(_type))
-        self.__style__ = check(Style, kwargs.get('style', None))
-        set_properties()
+            except _type.__error__ as error:
+                error.args += (attr,)
+                raise error
+        try:
+            self.__style__ = check(Style, kwargs.get('style', None))
+        except Style.__error__:
+            self.__style__ = NoAttribute()
+        self.set_properties()
 
     @classmethod
     def set_properties(cls):
@@ -66,7 +73,10 @@ class BaseSVG(object, metaclass=Register):
                     return getattr(self, '_' + attr)
                 def fset(self, value):
                     setattr(self, '_' + attr, check(_type, value))
-                return locals()
+                local = locals()
+                local.pop('attr')
+                local.pop('_type')
+                return local
             temp = property(**temp())
             setattr(cls, attr, temp)
 
@@ -78,7 +88,7 @@ class BaseSVG(object, metaclass=Register):
             check(Style, value)
             self.__style__ = value
         def fdel(self):
-            self.__style__ = None ##
+            self.__style__ = NoAttribute() ##
         return locals()
     style = property(**style())
 

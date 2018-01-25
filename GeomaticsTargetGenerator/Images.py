@@ -14,9 +14,9 @@ def Previewable(targetdefinition):
     """
     Converts a TargetDefinition to a Vector Image File to be saved and previewed.
     """
-    raise NotImplementedError() #TODO
     svg = SVG(targetdefinition.MaxRadius, targetdefinition.MaxRadius)
     center = int(targetdefinition.MaxRadius / 2)
+    center = Point(center, center)
     black = Style(colour="black")
     white = Style(colour="white")
     for barcode in reversed(targetdefinition.Cocentric):

@@ -18,7 +18,7 @@ class TargetFile(object):
 
     #File Types
     TDEF = 'tdef'
-    VECTOR_IMAGE = '' #TODO
+    VECTOR_IMAGE = 'svg'
     RASTER_IMAGE = '' #TODO
 
     STORAGE_LOCATION = 'TargetDefinitions'
@@ -73,7 +73,7 @@ class TargetFile(object):
             if NotFoundMaxRadius:
                 radius = NotFoundMaxRadius
             else:
-                radius = input('Please enter max radius:')
+                radius = float(input('Please enter max radius:'))
             return TargetDefinition(radius)
 
     def SaveTargetDefinition(self, targetdefinition):
@@ -91,7 +91,7 @@ class TargetFile(object):
         Loads a TargetDefinition from a {} file.
         """.format(TargetFile.VECTOR_IMAGE)
         filename = self.name(TargetFile.VECTOR_IMAGE)
-        with open(filename, mode='rb') as file:
+        with open(filename, mode='rt') as file:
             preview = file.read()
         return PreviewData(preview)
 
@@ -101,7 +101,7 @@ class TargetFile(object):
         """.format(TargetFile.VECTOR_IMAGE)
         filename = self.name(TargetFile.VECTOR_IMAGE)
         preview = Previewable(targetdefinition)
-        with open(filename, mode='wb') as file:
+        with open(filename, mode='wt') as file:
             file.write(preview)
 
     def SaveForPrint(self, targetdefinition, localdir=False):
@@ -119,7 +119,7 @@ class TargetFile(object):
         Converts a {} file to a {} file.
         """.format(TargetFile.VECTOR_IMAGE, TargetFile.RASTER_IMAGE)
         filename = self.name(TargetFile.VECTOR_IMAGE, localdir)
-        with open(filename, mode='rb') as file:
+        with open(filename, mode='rt') as file:
             preview = file.read()
         filename = self.name(TargetFile.RASTER_IMAGE)
         printing = Printable(preview)

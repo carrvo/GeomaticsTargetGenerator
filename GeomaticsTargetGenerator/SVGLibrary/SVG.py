@@ -24,10 +24,11 @@ class SVG(Container, BaseSVG): #favours Container
         """
         Initializes.
         """
-        super(Container, self).__init__([])
-        super(BaseSVG, self).__init__()
+        #should be super(Container, self).__init__(elements=[]) but does not work for some reason
+        super(Container, self).__thisclass__.__init__(self, elements=[])
+        super(BaseSVG, self).__thisclass__.__init__(self)
         self.xmlns = tag_attrs(self.__class__)['xmlns'] ##Until default supported
-        self.verion = tag_attrs(self.__class__)['version'] ##Until default supported
+        self.version = tag_attrs(self.__class__)['version'] ##Until default supported
         self.width = width
         self.height = height
 

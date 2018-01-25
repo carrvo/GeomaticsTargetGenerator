@@ -12,7 +12,8 @@ class Style(Stroke):
         """
         Initializes.
         """
-        super(Stroke, self).__init__(*args, **kwargs)
+        #should be super(Stroke, self).__init__(*args, **kwargs) but does not work for some reason
+        super(Stroke, self).__thisclass__.__init__(self, *args, **kwargs)
 
     def __xml_repr__(self, tag):
         """
