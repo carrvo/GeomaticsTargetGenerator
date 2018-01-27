@@ -2,6 +2,8 @@
 This module is for creating and printing image files from TargetDefinition.
 """
 
+from bs4 import BeautifulSoup as BS
+
 try:
     from .SVGLibrary import *
 except ImportError as error:
@@ -14,8 +16,9 @@ def Previewable(targetdefinition):
     """
     Converts a TargetDefinition to a Vector Image File to be saved and previewed.
     """
-    svg = SVG(targetdefinition.MaxRadius, targetdefinition.MaxRadius)
-    center = int(targetdefinition.MaxRadius / 2)
+    fill_area = targetdefinition.MaxRadius * 2
+    svg = SVG(fill_area, fill_area)
+    center = targetdefinition.MaxRadius
     center = Point(center, center)
     black = Style(colour="black")
     white = Style(colour="white")

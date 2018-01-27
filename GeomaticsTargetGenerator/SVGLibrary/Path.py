@@ -38,7 +38,7 @@ class PathSegment(Point):
     command = property(**command())
 
     def __xml_repr__(self):
-        return self.command + xmlrepr(super())
+        return self.command + xmlrepr(super().__thisclass__, self)
     __xml_repr__.__doc__ = Point.__xml_repr__.__doc__
 
     @classmethod

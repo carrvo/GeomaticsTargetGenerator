@@ -17,7 +17,7 @@ class Container(object):
         self.elements = elements
 
     def __xml_repr__(self, new_tag):
-        tag = xmlrepr(super(self.__mro__[2], self), new_tag) #assumes self.__mro__[1] == Container
+        tag = xmlrepr(super(self.__class__.__mro__[2], self).__thisclass__, self, new_tag) #assumes self.__mro__[1] == Container
         for element in self.elements:
             tag.append(xmlrepr(element, new_tag))
         return tag
@@ -71,7 +71,7 @@ class Hyperlink(BaseSVG):
         self.wrapped = wrapped
 
     def __xml_repr__(self, new_tag):
-        tag = xmlrepr(super(), new_tag)
+        tag = xmlrepr(super().__thisclass__, self, new_tag)
         tag.append(xmlrepr(self.wrapped, new_tag))
         return tag
     __xml_repr__.__doc__ = BaseSVG.__xml_repr__.__doc__

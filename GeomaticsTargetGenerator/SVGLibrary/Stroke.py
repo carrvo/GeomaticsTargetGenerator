@@ -13,17 +13,17 @@ class Stroke(AttributeSupport):
     """
 
     __svg_to_tag__ = {
-        'colour':'stroke',
+        'outline':'stroke',
         'thickness':'stroke-width',
         'linecap':'stroke-linecap',
         'dashes':'stroke-dasharray'
     }
 
-    def __init__(self, colour="black", thickness=1, linecap="square", dashes=tuple()):
+    def __init__(self, *args, outline="black", thickness=1, linecap="square", dashes=tuple(), **kwargs):
         """
         Initializes.
         """
-        self.colour = colour
+        self.outline = outline
         self.thickness = thickness
         self.linecap = linecap
         self.dashes = []

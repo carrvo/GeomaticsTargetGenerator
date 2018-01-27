@@ -40,7 +40,7 @@ class SVG(Container, BaseSVG): #favours Container
             soup = BeautifulSoup('', 'lxml')
         else:
             soup = BeautifulSoup('', 'xml')
-        soup.append(xmlrepr(super(Container, self), soup.new_tag))
+        soup.append(xmlrepr(super(Container, self).__thisclass__, self, soup.new_tag))
         return soup
 
     @classmethod
