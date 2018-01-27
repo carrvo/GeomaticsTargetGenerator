@@ -39,7 +39,7 @@ class BrokenRing(Path, Circle):
         https://stackoverflow.com/questions/29864022/drawing-parts-of-circles-circumference-in-svg
         """
         if angular_units == 'degrees':
-            angleInRadians = (angleInDegrees - 90) * math.pi / 180.0
+            angleInRadians = angle * math.pi / 180.0
         else: # angular_units == 'radians'
             angleInRadians = angle
         return {
@@ -94,7 +94,35 @@ class BrokenRing(Path, Circle):
         self.segments = []
         angles = [0] + list(angles) # safe for list conversion
         current_angle = 0
-        for index in range(0, 2, len(angles)):
+        for index in range(0, len(angles) - 1, 2): #len - 1 works for odd len but what if even?
             current_angle += angles[index]
             self.addArc(current_angle, current_angle + angles[index + 1], angular_units=angular_units)
             current_angle += angles[index + 1]
+
+class Ring(BrokenRing):
+    """
+    Extension to SVGLibrary for TargetDefinition conversion.
+
+    It is implemented as a Path but looks like a Circle.
+    NOTE: This replaces the Circle class for internal lookups.
+
+    http://complexdan.com/svg-circleellipse-to-path-converter/
+    https://stackoverflow.com/questions/5737975/circle-drawing-with-svgs-arc-path/10477334#10477334
+    """
+
+    __tag_name__ = Circle.__tag_name__ # subvert for Circle lookup
+
+    def __init__(self, center, radius, style=None):
+        """
+        Initializes.
+        """
+        super(BrokenRing, self).__thisclass__.__init__(self, center, radius, angles=[180, 0, 180], angular_units='degrees', style=style)
+
+    def makeCircle(self):
+        """
+        Resets the circle internally in case of disturbance.
+        """
+        self.replaceWithAngles([180, 0, 180], angular_units='degrees')
+
+    #TODO: __xml_repr__ and __xml_eval__ to convert Circle to Path
+Ring.__tag_name__ = Path.__tag_name__ # subvert for Circle lookup

@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup as BS
 from .SVGLibrary import *
 
 from .TargetDefinition import TargetDefinition
-from .BrokenCircle import BrokenRing
+from .BrokenCircle import BrokenRing, Ring
 
 def Previewable(targetdefinition):
     """
@@ -20,7 +20,10 @@ def Previewable(targetdefinition):
     for barcode in reversed(targetdefinition.Cocentric):
         #should be percentages of max not absolute
         line = Style(outline="black", thickness=barcode.Width())
-        svg.elements.append(BrokenRing(center, barcode.CenterRadius, barcode.Angles, angular_units='radians', style=line))
+        if len(barcode.Angles) == 1: # full circle
+            svg.elements.append(Ring(center, barcode.CenterRadius, style=line))
+        else:
+            svg.elements.append(BrokenRing(center, barcode.CenterRadius, barcode.Angles, angular_units='radians', style=line))
     for circle in targetdefinition.ColouredCircles:
         pass #TODO
     return xmlrepr(svg).prettify()
