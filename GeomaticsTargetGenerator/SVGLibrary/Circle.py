@@ -22,7 +22,7 @@ class Circle(BaseSVG):
         """
         Initializes.
         """
-        super().__init__(center=center, style=style)
+        super(BaseSVG, self).__thisclass__.__init__(self, center=center, style=style)
         self.radius = radius
         #short-cuts
         self.r = self.radius

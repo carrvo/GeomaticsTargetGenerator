@@ -27,7 +27,8 @@ class Rectangle(BaseSVG):
         """
         Initializes.
         """
-        super().__init__(
+        super(BaseSVG, self).__thisclass__.__init__(
+            self,
             position=position,
             size=size,
             rounded=rounded,

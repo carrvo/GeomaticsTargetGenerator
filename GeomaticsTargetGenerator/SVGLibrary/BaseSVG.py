@@ -31,7 +31,8 @@ class BaseSVG(object, metaclass=Register):
             and parameters (excludes style or style attributes).
             --> { 'name':type }
             --> if not included then must be manually coded
-        - in __init__ call super().__init__() with parameters in __svg_attrs__
+        - in __init__ call super(..., self).__thisclass__.__init__(self, ...)
+            with parameters in __svg_attrs__
             --> do not need to include all parameters
             --> note that if __svg_attrs__ type does
                     not have a __default__ method then

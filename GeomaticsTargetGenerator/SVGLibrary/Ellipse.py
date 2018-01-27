@@ -24,7 +24,7 @@ class Ellipse(BaseSVG):
         """
         Initializes.
         """
-        super().__init__(center=center, radius=radius, style=style)
+        super(BaseSVG, self).__thisclass__.__init__(self, center=center, radius=radius, style=style)
 
     #short-cuts
 

@@ -65,20 +65,20 @@ class Hyperlink(BaseSVG):
         """
         Initializes.
         """
-        super().__init__(url=url)
+        super(BaseSVG, self).__thisclass__.__init__(self, url=url)
         if not isinstance(wrapped, self.__class__.__type__):
             raise TypeError()##
         self.wrapped = wrapped
 
     def __xml_repr__(self, new_tag):
-        tag = xmlrepr(super().__thisclass__, self, new_tag)
+        tag = xmlrepr(super(BaseSVG, self).__thisclass__, self, new_tag)
         tag.append(xmlrepr(self.wrapped, new_tag))
         return tag
     __xml_repr__.__doc__ = BaseSVG.__xml_repr__.__doc__
 
     @classmethod
     def __xml_eval__(cls, tag):
-        hyper = xmleval(super(), tag)
+        hyper = xmleval(super(BaseSVG, self), tag)
         hyper.wrapped = xmleval(cls.__type__, tag.children[0])
         return hyper
     __xml_eval__.__doc__ = BaseSVG.__xml_eval__.__doc__

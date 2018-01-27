@@ -21,7 +21,7 @@ class TSpan(BaseSVG):
     }
 
     def __init__(self, position, text):
-        super().__init__(position=position)
+        super(BaseSVG, self).__thisclass__.__init__(self, position=position)
         self.text = text
 
     #short-cuts
@@ -45,7 +45,7 @@ class TSpan(BaseSVG):
     y = property(**y())
 
     def __xml_repr__(self, new_tag):
-        tag = xmlrepr(super().__thisclass__, self, new_tag)
+        tag = xmlrepr(super(BaseSVG, self).__thisclass__, self, new_tag)
         tag.string = str(self.text)
         return tag
     __xml_repr__.__doc__ = BaseSVG.__xml_repr__.__doc__

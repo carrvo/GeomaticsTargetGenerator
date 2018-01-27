@@ -16,7 +16,7 @@ class Console(Cmd):
         """
         Initializes.
         """
-        super().__init__(stdin=stdin, stdout=stdout)
+        super(Cmd, self).__thisclass__.__init__(self, stdin=stdin, stdout=stdout)
         self.primary_prompt = 'GTG>>> '
         self.secondary_prompt = 'GTG... '
         self.prompt = self.primary_prompt

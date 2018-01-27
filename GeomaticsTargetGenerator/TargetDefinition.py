@@ -32,6 +32,12 @@ class BarCode(object):
         """
         return self.OuterRadius - self.InnerRadius
 
+    def CenterRadius(self):
+        """
+        Radius in center of Width.
+        """
+        return self.InnerRadius + (self.Width() / 2)
+
     def ChangeRadii(self, inner, outer):
         """
         Changes the Inner Radus and Outer Radius.

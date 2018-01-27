@@ -16,6 +16,7 @@ from .Text import TSpan, Text
 from .SVG import SVG
 
 #Support Classes
+from .AttributeSupport import NoAttribute
 from .Style import Style
 from .Pair import Pair, Point
 #Path Commands

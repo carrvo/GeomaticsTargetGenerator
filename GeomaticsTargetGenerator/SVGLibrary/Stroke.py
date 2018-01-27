@@ -48,20 +48,25 @@ class Stroke(AttributeSupport):
                 return svg
         raise NameError('Name {} not found.'.format(name))
 
-    # could be separate attributes in the future
-    def __xml_repr__(self):
-        attrs = []
-        for svg, tag in self.__svg_to_tag__.items():
-            if not isinstance(svg, Iterable) or isinstance(svg, str): # more general
-                attrs.append(self.Attribute(tag, getattr(self, svg)))
+    # separates attributes
+    def __xml_repr__(self, tag): # def __xml_repr__(self):
+        # attrs = []
+        for svg, attr in self.__svg_to_tag__.items():
+            attribute = getattr(self, svg)
+            if not isinstance(attribute, Iterable) or isinstance(attribute, str): # more general
+                tag[attr] = attribute # attrs.append(self.Attribute(attr, attribute))
+
             else:
-                attrs.append(self.Attribute(tag, ','.join((getattr(self, svg)))))
-        return ';'.join(attrs)
+                tag[attr] = ','.join(attribute) # attrs.append(self.Attribute(attr, ','.join(attribute)))
+        return tag # return ';'.join(attrs)
     __xml_repr__.__doc__ = AttributeSupport.__xml_repr__.__doc__
 
-    # could be separate attributes in the future
-    @classmethod
-    def __xml_eval__(cls, string):
+    # separate attributes
+    @staticmethod # @classmethod
+    # static methods act the same as class methods but do not pass in the class so is viable override
+    def __xml_eval__(tag): # def __xml_eval__(cls, string):
+        return Stroke(**{svg:tag[attr] for svg, attr in Stroke.__svg_to_tag__.items() if tag.get(attr, None)})
+        '''
         string = string.split(';')
         obj = cls()
         for name, value in (s.split('=') for s in string):
@@ -74,4 +79,5 @@ class Stroke(AttributeSupport):
             except NameError:
                 continue # log/print this?
         return obj
+        '''
     __xml_eval__.__doc__ = AttributeSupport.__xml_eval__.__doc__

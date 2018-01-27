@@ -24,7 +24,8 @@ class Line(BaseSVG):
         """
         Initializes.
         """
-        super().__init__(
+        super(BaseSVG, self).__thisclass__.__init__(
+            self,
             position1=position1,
             position2=position2,
             style=style

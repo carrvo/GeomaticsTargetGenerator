@@ -3,7 +3,7 @@
 
 from .BaseSVG import BaseSVG
 from .Pair import Point
-from .__magic__ import xmlrepr, xmleval, name, check
+from .__magic__ import xmlrepr, xmleval, tagname, tag_attrs, check
 
 class Polyline(BaseSVG):
     """
@@ -20,12 +20,12 @@ class Polyline(BaseSVG):
         """
         Initializes.
         """
-        super().__init__(style=style)
+        super(BaseSVG, self).__thisclass__.__init__(self, style=style)
         self.points = points
 
     def __xml_repr__(self, new_tag):
         poly = new_tag(tagname(self.__class__))
-        poly[tag_attrs(self).keys()[0]] = ' '.join([xmlrepr(check(self.__class__.__list_type__, point)) for point in self.points])
+        poly[tuple(tag_attrs(self).keys())[0]] = ' '.join([xmlrepr(check(self.__class__.__list_type__, point)) for point in self.points])
         xmlrepr(self.style, poly)
         return poly
     __xml_repr__.__doc__ = BaseSVG.__xml_repr__.__doc__

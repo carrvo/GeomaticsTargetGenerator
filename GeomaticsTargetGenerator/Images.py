@@ -4,13 +4,10 @@ This module is for creating and printing image files from TargetDefinition.
 
 from bs4 import BeautifulSoup as BS
 
-try:
-    from .SVGLibrary import *
-except ImportError as error:
-    print(error)
-    error.with_traceback()
+from .SVGLibrary import *
 
 from .TargetDefinition import TargetDefinition
+from .BrokenCircle import BrokenRing
 
 def Previewable(targetdefinition):
     """
@@ -20,12 +17,10 @@ def Previewable(targetdefinition):
     svg = SVG(fill_area, fill_area)
     center = targetdefinition.MaxRadius
     center = Point(center, center)
-    black = Style(colour="black")
-    white = Style(colour="white")
     for barcode in reversed(targetdefinition.Cocentric):
         #should be percentages of max not absolute
-        svg.elements.append(Circle(center, barcode.OuterRadius, style=black))
-        svg.elements.append(Circle(center, barcode.InnerRadius, style=white))
+        line = Style(outline="black", thickness=barcode.Width())
+        svg.elements.append(BrokenRing(center, barcode.CenterRadius, barcode.Angles, angular_units='radians', style=line))
     for circle in targetdefinition.ColouredCircles:
         pass #TODO
     return xmlrepr(svg).prettify()
